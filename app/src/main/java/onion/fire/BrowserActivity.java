@@ -1,3 +1,13 @@
+/*
+ * Fire.onion
+ *
+ * http://play.google.com/store/apps/details?id=onion.fire
+ * http://onionapps.github.io/Fire.onion/
+ * http://github.com/onionApps/Fire.onion
+ *
+ * Author: http://github.com/onionApps - http://jkrnk73uid7p5thz.onion - bitcoin:1kGXfWx8PHZEVriCNkbP5hzD15HS4AyKf
+ */
+
 package onion.fire;
 
 import android.animation.LayoutTransition;
@@ -43,6 +53,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mozilla.gecko.EventDispatcher;
+import org.mozilla.gecko.GeckoActivity;
 import org.mozilla.gecko.GeckoAppShell;
 import org.mozilla.gecko.GeckoEvent;
 import org.mozilla.gecko.GeckoView;
@@ -104,7 +115,7 @@ public class BrowserActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
 
         skipcleanup = false;
 
@@ -116,13 +127,10 @@ public class BrowserActivity extends ActionBarActivity {
 
         super.onCreate(savedInstanceState);
 
-        final boolean init = getIntent() == null || getIntent().getBooleanExtra("init", true);
+        final boolean init = (getIntent() == null || getIntent().getBooleanExtra("init", true) || tor == null);
 
         if (init) {
             tor = new Tor(this);
-        }
-
-        if (init) {
             cleanup();
         }
 
@@ -635,7 +643,7 @@ public class BrowserActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         if (skipcleanup) {
             Log.i(TAG, "onDestroy skipped");
             super.onDestroy();
@@ -1495,7 +1503,7 @@ public class BrowserActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         timer.cancel();
         timer.purge();
         timer = null;

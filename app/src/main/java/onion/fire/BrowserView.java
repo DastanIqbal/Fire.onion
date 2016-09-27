@@ -1,8 +1,19 @@
+/*
+ * Fire.onion
+ *
+ * http://play.google.com/store/apps/details?id=onion.fire
+ * http://onionapps.github.io/Fire.onion/
+ * http://github.com/onionApps/Fire.onion
+ *
+ * Author: http://github.com/onionApps - http://jkrnk73uid7p5thz.onion - bitcoin:1kGXfWx8PHZEVriCNkbP5hzD15HS4AyKf
+ */
+
 package onion.fire;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.InputType;
 import android.util.AttributeSet;
@@ -14,12 +25,15 @@ import android.view.MotionEvent;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.gecko.EventDispatcher;
+import org.mozilla.gecko.GeckoAppShell;
+import org.mozilla.gecko.GeckoEvent;
 import org.mozilla.gecko.GeckoView;
 import org.mozilla.gecko.Tab;
 import org.mozilla.gecko.Tabs;
@@ -39,7 +53,6 @@ public class BrowserView extends GeckoView {
         return instance;
     }
 
-
     private String getCurrentUrl() {
         Tab tab = Tabs.getInstance().getSelectedTab();
         return tab != null ? tab.getURL() : "";
@@ -52,7 +65,6 @@ public class BrowserView extends GeckoView {
             return "";
         }
     }
-
 
     String TAG = "BrowserView";
 
@@ -92,7 +104,6 @@ public class BrowserView extends GeckoView {
         }, "Intent:GetHandlers");
 
         setInputConnectionHandler(null);
-
 
         try {
 
@@ -233,8 +244,6 @@ public class BrowserView extends GeckoView {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-
-
     }
 
     GestureDetectorCompat gestureDetector;
@@ -260,8 +269,6 @@ public class BrowserView extends GeckoView {
         }
 
         return true;
-
-        //return super.onTouchEvent(event);
     }
 
     boolean contextmenu_mousedown = false;
@@ -330,110 +337,36 @@ public class BrowserView extends GeckoView {
         setInputConnectionHandler(null);
     }
 
-    /*
     @Override
-    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-
-        log("onCreateInputConnection");
-
-        //outAttrs.makeCompatible(16);
-
-        //super.onCreateInputConnection(outAttrs);
-
-        outAttrs.initialSelStart = -1;
-        outAttrs.initialSelEnd = -1;
-
-        //outAttrs.inputType = InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
-
-        outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
-
-        outAttrs.imeOptions = EditorInfo.IME_ACTION_NONE;
-
-        if (!allowInput) {
-            return null;
-        }
-
-        return new BaseInputConnection(this, false) {
-
-            // backspace fix?
-            @Override
-            public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-                if (beforeLength == 1 && afterLength == 0) {
-                    log("deleteSurroundingText backspace fix");
-                    return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-                            && sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
-                }
-                log("deleteSurroundingText dispatch");
-                return super.deleteSurroundingText(beforeLength, afterLength);
-            }
-
-            @Override
-            public boolean sendKeyEvent(KeyEvent event) {
-                log("sendKeyEvent dispatch " + event);
-                return super.sendKeyEvent(event);
-            }
-
-            @Override
-            public boolean setSelection(int start, int end) {
-                log("setSelection " + start + " " + end);
-                return super.setSelection(start, end);
-                //return true;
-            }
-
-        };
-
+    public boolean onKeyPreIme(int i, KeyEvent keyEvent) {
+        log("onKeyPreIme " + i + " " + keyEvent);
+        return super.onKeyPreIme(i, keyEvent);
     }
-    */
+
+    @Override
+    public boolean onKeyDown(int i, KeyEvent event) {
+        log("onKeyDown " + i + " " + event);
+        //return super.onKeyDown(i, event);
+        GeckoAppShell.sendEventToGeckoSync(GeckoEvent.createKeyEvent(event, event.getAction(), 0));
+        return true;
+    }
+
+    @Override
+    public boolean onKeyUp(int i, KeyEvent event) {
+        log("onKeyUp " + i + " " + event);
+        //return super.onKeyUp(i, event);
+        GeckoAppShell.sendEventToGeckoSync(GeckoEvent.createKeyEvent(event, event.getAction(), 0));
+        return true;
+    }
+
+    @Override
+    public boolean onCheckIsTextEditor() {
+        return false;
+    }
 
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-
-        log("onCreateInputConnection");
-
-        outAttrs.makeCompatible(16);
-
-        //super.onCreateInputConnection(outAttrs);
-
-        outAttrs.initialSelStart = -1;
-        outAttrs.initialSelEnd = -1;
-
-        //outAttrs.inputType = InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
-
-        outAttrs.inputType = 0;
-
-        if (!allowInput) {
-            return null;
-        }
-
-        return new BaseInputConnection(this, false) {
-
-            // backspace fix?
-            @Override
-            public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-                if (beforeLength == 1 && afterLength == 0) {
-                    log("deleteSurroundingText backspace fix");
-                    return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-                            && sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
-                }
-                log("deleteSurroundingText dispatch");
-                return super.deleteSurroundingText(beforeLength, afterLength);
-            }
-
-            @Override
-            public boolean sendKeyEvent(KeyEvent event) {
-                log("sendKeyEvent dispatch " + event);
-                return super.sendKeyEvent(event);
-            }
-
-            @Override
-            public boolean setSelection(int start, int end) {
-                log("setSelection " + start + " " + end);
-                return super.setSelection(start, end);
-                //return true;
-            }
-
-        };
-
+        return null;
     }
 
 }

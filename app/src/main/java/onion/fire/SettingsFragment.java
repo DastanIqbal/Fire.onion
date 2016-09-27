@@ -1,3 +1,13 @@
+/*
+ * Fire.onion
+ *
+ * http://play.google.com/store/apps/details?id=onion.fire
+ * http://onionapps.github.io/Fire.onion/
+ * http://github.com/onionApps/Fire.onion
+ *
+ * Author: http://github.com/onionApps - http://jkrnk73uid7p5thz.onion - bitcoin:1kGXfWx8PHZEVriCNkbP5hzD15HS4AyKf
+ */
+
 package onion.fire;
 
 import android.app.AlertDialog;
@@ -45,6 +55,8 @@ public class SettingsFragment extends PreferenceFragment {
 
         Settings.getPrefs(getActivity());
         addPreferencesFromResource(R.xml.prefs);
+
+
 
         findPreference("webrtc").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -117,6 +129,8 @@ public class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
+
+
 
     }
 
